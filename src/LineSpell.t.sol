@@ -48,3 +48,77 @@ contract LineSpellTest is DssDeployTestBase {
         spell.cast();
     }
 }
+
+contract MultiLineSpellTest is DssDeployTestBase {
+    MultiLineSpell spell;
+    bytes32[] ilks;
+    uint256[] lines;
+
+    function setUp() public {
+        super.setUp();
+        deploy();
+    }
+
+    function testFailCastEmptyIlks() public {
+        lines = [ 1 ];
+        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        DSRoles role = DSRoles(address(mom.authority()));
+        role.setRootUser(address(spell), true);
+
+        spell.cast();
+    }
+
+    function testFailCastEmptyLines() public {
+        ilks = [ bytes32("GOLD") ];
+        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        DSRoles role = DSRoles(address(mom.authority()));
+        role.setRootUser(address(spell), true);
+
+        spell.cast();
+    }
+
+    function testFailCastBothEmpty() public {
+        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        DSRoles role = DSRoles(address(mom.authority()));
+        role.setRootUser(address(spell), true);
+
+        spell.cast();
+    }
+
+    function testFailCastMismatchedLengths() public {
+        ilks = new bytes32[](1);
+        lines = new uint256[](2);
+        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        DSRoles role = DSRoles(address(mom.authority()));
+        role.setRootUser(address(spell), true);
+
+        spell.cast();
+    }
+
+    function testCast() public {
+        ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
+        lines = [ 100, 200 ];
+
+        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        DSRoles role = DSRoles(address(mom.authority()));
+        role.setRootUser(address(spell), true);
+        spell.cast();
+
+        for (uint8 i = 0; i < ilks.length; i++) {
+            (, uint256 l) = pit.ilks(ilks[i]);
+            assertEq(lines[i], l);
+        }
+    }
+
+    function testFailRepeatedCast() public {
+        ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
+        lines = [ 100, 200 ];
+
+        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        DSRoles role = DSRoles(address(mom.authority()));
+        role.setRootUser(address(spell), true);
+        spell.cast();
+
+        spell.cast();
+    }
+}
