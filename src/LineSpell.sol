@@ -53,12 +53,12 @@ contract LineSpell {
 }
 
 contract MultiLineSpell {
-    MomLike mom;
-    address momLib;
-    address pit;
+    MomLike   mom;
+    address   momLib;
+    address   pit;
     bytes32[] ilks;
     uint256[] lines;
-    bool    done;
+    bool      done;
 
     constructor(address _mom, address _momLib, address _pit, bytes32[] memory _ilks, uint256[] memory _lines) public {
         require(_ilks.length == _lines.length, "mismatched lengths of ilks, lines");
@@ -67,8 +67,8 @@ contract MultiLineSpell {
         mom    = MomLike(_mom);
         momLib = _momLib;
         pit    = _pit;
-        ilks    = _ilks;
-        lines   = _lines;
+        ilks   = _ilks;
+        lines  = _lines;
     }
 
     function cast() public {
