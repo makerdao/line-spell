@@ -22,8 +22,8 @@ import "./LineSpell.sol";
 
 contract LineSpellTest is DssDeployTestBase {
     LineSpell spell;
-    bytes32 ilk = "foobar";
-    uint256 constant ONE = 10 ** 18;
+    bytes32 ilk = "GOLD";
+    uint256 constant ONE  = 10 ** 18;
     uint256 constant line = 10 * ONE;
 
     function setUp() public {
@@ -31,12 +31,20 @@ contract LineSpellTest is DssDeployTestBase {
         deploy();
     }
 
-    function testLine() public {
+    function testCast() public {
         spell = new LineSpell(address(mom), address(momLib), address(pit), ilk, line);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
         spell.cast();
         (, uint256 l) = pit.ilks(ilk);
         assertEq(line, l);
+    }
+
+    function testFailRepeatedCast() public {
+        spell = new LineSpell(address(mom), address(momLib), address(pit), ilk, line);
+        DSRoles role = DSRoles(address(mom.authority()));
+        role.setRootUser(address(spell), true);
+        spell.cast();
+        spell.cast();
     }
 }
