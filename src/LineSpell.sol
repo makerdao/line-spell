@@ -22,15 +22,15 @@ contract MomLike {
 contract LineSpell {
     MomLike mom;
     address momLib;
-    address pit;
+    address vat;
     bytes32 ilk;
     uint256 line;
     bool    done;
 
-    constructor(address _mom, address _momLib, address _pit, bytes32 _ilk, uint256 _line) public {
+    constructor(address _mom, address _momLib, address _vat, bytes32 _ilk, uint256 _line) public {
         mom    = MomLike(_mom);
         momLib = _momLib;
-        pit    = _pit;
+        vat    = _vat;
         ilk    = _ilk;
         line   = _line;
     }
@@ -41,7 +41,7 @@ contract LineSpell {
         bytes memory sig =
             abi.encodeWithSignature(
                 "file(address,bytes32,bytes32,uint256)",
-                pit,
+                vat,
                 ilk,
                 bytes32("line"),
                 line
@@ -55,18 +55,18 @@ contract LineSpell {
 contract MultiLineSpell {
     MomLike   mom;
     address   momLib;
-    address   pit;
+    address   vat;
     bytes32[] ilks;
     uint256[] lines;
     bool      done;
 
-    constructor(address _mom, address _momLib, address _pit, bytes32[] memory _ilks, uint256[] memory _lines) public {
+    constructor(address _mom, address _momLib, address _vat, bytes32[] memory _ilks, uint256[] memory _lines) public {
         require(_ilks.length == _lines.length, "mismatched lengths of ilks, lines");
         require(_ilks.length > 0, "no ilks");
 
         mom    = MomLike(_mom);
         momLib = _momLib;
-        pit    = _pit;
+        vat    = _vat;
         ilks   = _ilks;
         lines  = _lines;
     }
@@ -78,7 +78,7 @@ contract MultiLineSpell {
             bytes memory sig =
                 abi.encodeWithSignature(
                     "file(address,bytes32,bytes32,uint256)",
-                    pit,
+                    vat,
                     ilks[i],
                     bytes32("line"),
                     lines[i]

@@ -32,16 +32,16 @@ contract LineSpellTest is DssDeployTestBase {
     }
 
     function testCast() public {
-        spell = new LineSpell(address(mom), address(momLib), address(pit), ilk, line);
+        spell = new LineSpell(address(mom), address(momLib), address(vat), ilk, line);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
         spell.cast();
-        (, uint256 l) = pit.ilks(ilk);
+        (,,, uint256 l,) = vat.ilks(ilk);
         assertEq(line, l);
     }
 
     function testFailRepeatedCast() public {
-        spell = new LineSpell(address(mom), address(momLib), address(pit), ilk, line);
+        spell = new LineSpell(address(mom), address(momLib), address(vat), ilk, line);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
         spell.cast();
@@ -61,7 +61,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
 
     function testFailCastEmptyIlks() public {
         lines = [ 1 ];
-        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        spell = new MultiLineSpell(address(mom), address(momLib), address(vat), ilks, lines);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
 
@@ -70,7 +70,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
 
     function testFailCastEmptyLines() public {
         ilks = [ bytes32("GOLD") ];
-        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        spell = new MultiLineSpell(address(mom), address(momLib), address(vat), ilks, lines);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
 
@@ -78,7 +78,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
     }
 
     function testFailCastBothEmpty() public {
-        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        spell = new MultiLineSpell(address(mom), address(momLib), address(vat), ilks, lines);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
 
@@ -88,7 +88,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
     function testFailCastMismatchedLengths() public {
         ilks = new bytes32[](1);
         lines = new uint256[](2);
-        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        spell = new MultiLineSpell(address(mom), address(momLib), address(vat), ilks, lines);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
 
@@ -99,13 +99,13 @@ contract MultiLineSpellTest is DssDeployTestBase {
         ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
         lines = [ 100, 200 ];
 
-        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        spell = new MultiLineSpell(address(mom), address(momLib), address(vat), ilks, lines);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
         spell.cast();
 
         for (uint8 i = 0; i < ilks.length; i++) {
-            (, uint256 l) = pit.ilks(ilks[i]);
+            (,,, uint256 l,) = vat.ilks(ilks[i]);
             assertEq(lines[i], l);
         }
     }
@@ -114,7 +114,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
         ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
         lines = [ 100, 200 ];
 
-        spell = new MultiLineSpell(address(mom), address(momLib), address(pit), ilks, lines);
+        spell = new MultiLineSpell(address(mom), address(momLib), address(vat), ilks, lines);
         DSRoles role = DSRoles(address(mom.authority()));
         role.setRootUser(address(spell), true);
         spell.cast();
