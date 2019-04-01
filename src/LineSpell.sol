@@ -84,7 +84,7 @@ contract MultiLineSpell {
     }
 
     function schedule() public {
-        require(!done, "spell already cast");
+        require(!done, "spell-already-cast");
 
         for (uint256 i = 0; i < ilks.length; i++) {
             bytes memory sig =
@@ -100,7 +100,7 @@ contract MultiLineSpell {
     }
 
     function cast() public {
-        require(!done, "spell already cast");
+        require(!done, "spell-already-cast");
 
         for (uint256 i = 0; i < ilks.length; i++) {
             bytes memory sig =
