@@ -23,9 +23,13 @@ import "./LineSpell.sol";
 contract LineSpellTest is DssDeployTestBase {
     LineSpell spell;
     bytes32 ilk = "GOLD";
-    uint256 constant ONE  = 10 ** 18;
-    uint256 constant line = 10 * ONE;
+    uint256 constant line = 10 * 10**18;
     uint256 constant wait = 0;
+
+    function elect() private {
+        DSRoles role = DSRoles(address(pause.authority()));
+        role.setRootUser(address(spell), true);
+    }
 
     function setUp() public {
         super.setUp();
@@ -34,8 +38,7 @@ contract LineSpellTest is DssDeployTestBase {
 
     function testCast() public {
         spell = new LineSpell(address(pause), address(plan), wait, address(vat), ilk, line);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
@@ -45,8 +48,7 @@ contract LineSpellTest is DssDeployTestBase {
 
     function testFailRepeatedCast() public {
         spell = new LineSpell(address(pause), address(plan), wait, address(vat), ilk, line);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
@@ -65,11 +67,15 @@ contract MultiLineSpellTest is DssDeployTestBase {
         deploy();
     }
 
+    function elect() private {
+        DSRoles role = DSRoles(address(pause.authority()));
+        role.setRootUser(address(spell), true);
+    }
+
     function testFailCastEmptyIlks() public {
         lines = [ 1 ];
         spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
@@ -78,8 +84,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
     function testFailCastEmptyLines() public {
         ilks = [ bytes32("GOLD") ];
         spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
@@ -87,8 +92,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
 
     function testFailCastBothEmpty() public {
         spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
@@ -98,8 +102,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
         ilks = new bytes32[](1);
         lines = new uint256[](2);
         spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
@@ -110,8 +113,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
         lines = [ 100, 200 ];
 
         spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
@@ -127,8 +129,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
         lines = [ 100, 200 ];
 
         spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
+        elect();
         spell.schedule();
 
         spell.cast();
