@@ -24,7 +24,7 @@ contract LineSpellTest is DssDeployTestBase {
     LineSpell spell;
     bytes32 ilk = "GOLD";
     uint256 constant line = 10 * 10**18;
-    uint256 constant wait = 10;
+    uint256 wait;
 
     function elect() private {
         DSRoles role = DSRoles(address(pause.authority()));
@@ -34,6 +34,7 @@ contract LineSpellTest is DssDeployTestBase {
     function setUp() public {
         super.setUp();
         deploy();
+        wait = pause.delay();
     }
 
     function testCast() public {
@@ -62,11 +63,12 @@ contract MultiLineSpellTest is DssDeployTestBase {
     MultiLineSpell spell;
     bytes32[] ilks;
     uint256[] lines;
-    uint256 constant wait = 10;
+    uint256 wait;
 
     function setUp() public {
         super.setUp();
         deploy();
+        wait = pause.delay();
     }
 
     function elect() private {
