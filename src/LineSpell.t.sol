@@ -24,7 +24,7 @@ contract LineSpellTest is DssDeployTestBase {
     LineSpell spell;
     bytes32 ilk = "GOLD";
     uint256 constant line = 10 * 10**18;
-    uint256 constant wait = 0;
+    uint256 constant wait = 10;
 
     function elect() private {
         DSRoles role = DSRoles(address(pause.authority()));
@@ -37,9 +37,10 @@ contract LineSpellTest is DssDeployTestBase {
     }
 
     function testCast() public {
-        spell = new LineSpell(address(pause), address(plan), wait, address(vat), ilk, line);
+        spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
         (,,, uint256 l,) = vat.ilks(ilk);
@@ -47,9 +48,10 @@ contract LineSpellTest is DssDeployTestBase {
     }
 
     function testFailRepeatedCast() public {
-        spell = new LineSpell(address(pause), address(plan), wait, address(vat), ilk, line);
+        spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
         spell.cast();
@@ -60,7 +62,7 @@ contract MultiLineSpellTest is DssDeployTestBase {
     MultiLineSpell spell;
     bytes32[] ilks;
     uint256[] lines;
-    uint256 constant wait = 0;
+    uint256 constant wait = 10;
 
     function setUp() public {
         super.setUp();
@@ -74,26 +76,29 @@ contract MultiLineSpellTest is DssDeployTestBase {
 
     function testFailCastEmptyIlks() public {
         lines = [ 1 ];
-        spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
+        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
     }
 
     function testFailCastEmptyLines() public {
         ilks = [ bytes32("GOLD") ];
-        spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
+        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
     }
 
     function testFailCastBothEmpty() public {
-        spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
+        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
     }
@@ -101,9 +106,10 @@ contract MultiLineSpellTest is DssDeployTestBase {
     function testFailCastMismatchedLengths() public {
         ilks = new bytes32[](1);
         lines = new uint256[](2);
-        spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
+        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
     }
@@ -112,9 +118,10 @@ contract MultiLineSpellTest is DssDeployTestBase {
         ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
         lines = [ 100, 200 ];
 
-        spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
+        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
 
@@ -128,9 +135,10 @@ contract MultiLineSpellTest is DssDeployTestBase {
         ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
         lines = [ 100, 200 ];
 
-        spell = new MultiLineSpell(address(pause), address(plan), wait, address(vat), ilks, lines);
+        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
         elect();
-        spell.schedule();
+        spell.schedule(wait);
+        hevm.warp(now + wait);
 
         spell.cast();
         spell.cast();

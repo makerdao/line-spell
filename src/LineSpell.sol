@@ -23,17 +23,16 @@ contract PauseLike {
 contract LineSpell {
     PauseLike pause;
     address   plan;
-    uint256   wait;
+    uint256   eta;
     bytes     sig;
     address   vat;
     bytes32   ilk;
     uint256   line;
     bool      done;
 
-    constructor(address _pause, address _plan, uint256 _wait, address _vat, bytes32 _ilk, uint256 _line) public {
+    constructor(address _pause, address _plan, address _vat, bytes32 _ilk, uint256 _line) public {
         pause = PauseLike(_pause);
         plan  = _plan;
-        wait  = _wait;
         vat   = _vat;
         ilk   = _ilk;
         line  = _line;
@@ -47,16 +46,17 @@ contract LineSpell {
 
     }
 
-    function schedule() public {
-        require(!done, "spell-already-cast");
+    function schedule(uint256 wait) public {
+        require(eta == 0, "spell-already-scheduled");
+        eta = now + wait;
 
-        pause.plan(plan, sig, wait);
+        pause.plan(plan, sig, eta);
     }
 
     function cast() public {
         require(!done, "spell-already-cast");
 
-        pause.exec(plan, sig, wait);
+        pause.exec(plan, sig, eta);
 
         done = true;
     }
@@ -65,26 +65,26 @@ contract LineSpell {
 contract MultiLineSpell {
     PauseLike pause;
     address   plan;
-    uint256   wait;
+    uint256   eta;
     address   vat;
     bytes32[] ilks;
     uint256[] lines;
     bool      done;
 
-    constructor(address _pause, address _plan, uint256 _wait, address _vat, bytes32[] memory _ilks, uint256[] memory _lines) public {
+    constructor(address _pause, address _plan, address _vat, bytes32[] memory _ilks, uint256[] memory _lines) public {
         require(_ilks.length == _lines.length, "mismatched lengths of ilks, lines");
         require(_ilks.length > 0, "no ilks");
 
         pause = PauseLike(_pause);
         plan  = _plan;
-        wait  = _wait;
         vat   = _vat;
         ilks  = _ilks;
         lines = _lines;
     }
 
-    function schedule() public {
-        require(!done, "spell-already-cast");
+    function schedule(uint256 wait) public {
+        require(eta == 0, "spell-already-scheduled");
+        eta = now + wait;
 
         for (uint256 i = 0; i < ilks.length; i++) {
             bytes memory sig =
@@ -95,7 +95,7 @@ contract MultiLineSpell {
                     bytes32("line"),
                     lines[i]
             );
-            pause.plan(plan, sig, wait);
+            pause.plan(plan, sig, eta);
         }
     }
 
@@ -111,7 +111,7 @@ contract MultiLineSpell {
                     bytes32("line"),
                     lines[i]
             );
-            pause.exec(plan, sig, wait);
+            pause.exec(plan, sig, eta);
         }
 
         done = true;
