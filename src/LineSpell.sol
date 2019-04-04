@@ -16,6 +16,7 @@
 pragma solidity ^0.5.4;
 
 contract PauseLike {
+    function delay() public view returns (uint256);
     function plan(address, bytes memory, uint256) public;
     function exec(address, bytes memory, uint256) public;
 }
@@ -46,9 +47,9 @@ contract LineSpell {
 
     }
 
-    function schedule(uint256 wait) public {
+    function schedule() public {
         require(eta == 0, "spell-already-scheduled");
-        eta = now + wait;
+        eta = now + PauseLike(pause).delay();
 
         pause.plan(plan, sig, eta);
     }
@@ -82,9 +83,9 @@ contract MultiLineSpell {
         lines = _lines;
     }
 
-    function schedule(uint256 wait) public {
+    function schedule() public {
         require(eta == 0, "spell-already-scheduled");
-        eta = now + wait;
+        eta = now + PauseLike(pause).delay();
 
         for (uint256 i = 0; i < ilks.length; i++) {
             bytes memory sig =
