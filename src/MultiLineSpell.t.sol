@@ -37,6 +37,27 @@ contract MultiLineSpellTest is DssDeployTestBase {
         role.setRootUser(address(spell), true);
     }
 
+    function testConstructor() public {
+        ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
+        lines = [ 100, 200 ];
+
+        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
+
+        for (uint256 i = 0; i < ilks.length; i++) {
+            assertEq(spell.ilks(i), ilks[i]);
+        }
+        for (uint256 i = 0; i < lines.length; i++) {
+            assertEq(spell.lines(i), lines[i]);
+        }
+
+        assertEq(address(spell.pause()), address(pause));
+        assertEq(address(spell.plan()),  address(plan));
+        assertEq(address(spell.vat()),   address(vat));
+
+        assertEq(spell.eta(), 0);
+        assertTrue(!spell.done());
+    }
+
     function testFailCastEmptyIlks() public {
         lines = [ 1 ];
         spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);

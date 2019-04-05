@@ -22,13 +22,13 @@ contract PauseLike {
 }
 
 contract MultiLineSpell {
-    PauseLike pause;
-    address   plan;
-    uint256   eta;
-    address   vat;
-    bytes32[] ilks;
-    uint256[] lines;
-    bool      done;
+    PauseLike public pause;
+    address   public plan;
+    uint256   public eta;
+    address   public vat;
+    bytes32[] public ilks;
+    uint256[] public lines;
+    bool      public done;
 
     constructor(address _pause, address _plan, address _vat, bytes32[] memory _ilks, uint256[] memory _lines) public {
         require(_ilks.length == _lines.length, "mismatched lengths of ilks, lines");

@@ -37,6 +37,26 @@ contract LineSpellTest is DssDeployTestBase {
         wait = pause.delay();
     }
 
+    function testConstructor() public {
+        spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
+
+        bytes memory expectedSig = abi.encodeWithSignature(
+            "file(address,bytes32,bytes32,uint256)",
+            vat, ilk, bytes32("line"), line
+        );
+        assertEq0(spell.sig(), expectedSig);
+
+        assertEq(address(spell.pause()), address(pause));
+        assertEq(address(spell.plan()),  address(plan));
+        assertEq(address(spell.vat()),   address(vat));
+
+        assertEq(spell.line(), line);
+        assertEq(spell.ilk(),  ilk);
+        assertEq(spell.eta(), 0);
+
+        assertTrue(!spell.done());
+    }
+
     function testCast() public {
         spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
         elect();

@@ -22,14 +22,14 @@ contract PauseLike {
 }
 
 contract LineSpell {
-    PauseLike pause;
-    address   plan;
-    uint256   eta;
-    bytes     sig;
-    address   vat;
-    bytes32   ilk;
-    uint256   line;
-    bool      done;
+    PauseLike public pause;
+    address   public plan;
+    uint256   public eta;
+    bytes     public sig;
+    address   public vat;
+    bytes32   public ilk;
+    uint256   public line;
+    bool      public done;
 
     constructor(address _pause, address _plan, address _vat, bytes32 _ilk, uint256 _line) public {
         pause = PauseLike(_pause);
