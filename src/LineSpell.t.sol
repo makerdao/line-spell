@@ -37,6 +37,26 @@ contract LineSpellTest is DssDeployTestBase {
         wait = pause.delay();
     }
 
+    function testConstructor() public {
+        spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
+
+        bytes memory expectedSig = abi.encodeWithSignature(
+            "file(address,bytes32,bytes32,uint256)",
+            vat, ilk, bytes32("line"), line
+        );
+        assertEq0(spell.sig(), expectedSig);
+
+        assertEq(address(spell.pause()), address(pause));
+        assertEq(address(spell.plan()),  address(plan));
+        assertEq(address(spell.vat()),   address(vat));
+
+        assertEq(spell.line(), line);
+        assertEq(spell.ilk(),  ilk);
+        assertEq(spell.eta(), 0);
+
+        assertTrue(!spell.done());
+    }
+
     function testCast() public {
         spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
         elect();
@@ -50,94 +70,6 @@ contract LineSpellTest is DssDeployTestBase {
 
     function testFailRepeatedCast() public {
         spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
-        elect();
-        spell.schedule();
-        hevm.warp(now + wait);
-
-        spell.cast();
-        spell.cast();
-    }
-}
-
-contract MultiLineSpellTest is DssDeployTestBase {
-    MultiLineSpell spell;
-    bytes32[] ilks;
-    uint256[] lines;
-    uint256 wait;
-
-    function setUp() public {
-        super.setUp();
-        deploy();
-        wait = pause.delay();
-    }
-
-    function elect() private {
-        DSRoles role = DSRoles(address(pause.authority()));
-        role.setRootUser(address(spell), true);
-    }
-
-    function testFailCastEmptyIlks() public {
-        lines = [ 1 ];
-        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
-        elect();
-        spell.schedule();
-        hevm.warp(now + wait);
-
-        spell.cast();
-    }
-
-    function testFailCastEmptyLines() public {
-        ilks = [ bytes32("GOLD") ];
-        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
-        elect();
-        spell.schedule();
-        hevm.warp(now + wait);
-
-        spell.cast();
-    }
-
-    function testFailCastBothEmpty() public {
-        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
-        elect();
-        spell.schedule();
-        hevm.warp(now + wait);
-
-        spell.cast();
-    }
-
-    function testFailCastMismatchedLengths() public {
-        ilks = new bytes32[](1);
-        lines = new uint256[](2);
-        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
-        elect();
-        spell.schedule();
-        hevm.warp(now + wait);
-
-        spell.cast();
-    }
-
-    function testCast() public {
-        ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
-        lines = [ 100, 200 ];
-
-        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
-        elect();
-        spell.schedule();
-        hevm.warp(now + wait);
-
-        spell.cast();
-
-        for (uint8 i = 0; i < ilks.length; i++) {
-            (,,, uint256 l,) = vat.ilks(ilks[i]);
-            assertEq(lines[i], l);
-        }
-    }
-
-    function testFailRepeatedCast() public {
-        ilks  = [ bytes32("GOLD"), bytes32("GELD") ];
-        lines = [ 100, 200 ];
-
-        spell = new MultiLineSpell(address(pause), address(plan), address(vat), ilks, lines);
         elect();
         spell.schedule();
         hevm.warp(now + wait);

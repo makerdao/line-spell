@@ -21,45 +21,58 @@ contract PauseLike {
     function exec(address, bytes memory, uint256) public;
 }
 
-contract LineSpell {
+contract MultiLineSpell {
     PauseLike public pause;
     address   public plan;
     uint256   public eta;
-    bytes     public sig;
     address   public vat;
-    bytes32   public ilk;
-    uint256   public line;
+    bytes32[] public ilks;
+    uint256[] public lines;
     bool      public done;
 
-    constructor(address _pause, address _plan, address _vat, bytes32 _ilk, uint256 _line) public {
+    constructor(address _pause, address _plan, address _vat, bytes32[] memory _ilks, uint256[] memory _lines) public {
+        require(_ilks.length == _lines.length, "mismatched lengths of ilks, lines");
+        require(_ilks.length > 0, "no ilks");
+
         pause = PauseLike(_pause);
         plan  = _plan;
         vat   = _vat;
-        ilk   = _ilk;
-        line  = _line;
-        sig   = abi.encodeWithSignature(
-                "file(address,bytes32,bytes32,uint256)",
-                vat,
-                ilk,
-                bytes32("line"),
-                line
-        );
-
+        ilks  = _ilks;
+        lines = _lines;
     }
 
     function schedule() public {
         require(eta == 0, "spell-already-scheduled");
         eta = now + PauseLike(pause).delay();
 
-        pause.plan(plan, sig, eta);
+        for (uint256 i = 0; i < ilks.length; i++) {
+            bytes memory sig =
+                abi.encodeWithSignature(
+                    "file(address,bytes32,bytes32,uint256)",
+                    vat,
+                    ilks[i],
+                    bytes32("line"),
+                    lines[i]
+            );
+            pause.plan(plan, sig, eta);
+        }
     }
 
     function cast() public {
         require(!done, "spell-already-cast");
 
-        pause.exec(plan, sig, eta);
+        for (uint256 i = 0; i < ilks.length; i++) {
+            bytes memory sig =
+                abi.encodeWithSignature(
+                    "file(address,bytes32,bytes32,uint256)",
+                    vat,
+                    ilks[i],
+                    bytes32("line"),
+                    lines[i]
+            );
+            pause.exec(plan, sig, eta);
+        }
 
         done = true;
     }
 }
-
