@@ -17,7 +17,7 @@ pragma solidity ^0.5.4;
 
 contract PauseLike {
     function delay() public view returns (uint256);
-    function plan(address, bytes memory, uint256) public;
+    function plot(address, bytes memory, uint256) public;
     function exec(address, bytes memory, uint256) public;
 }
 
@@ -54,7 +54,7 @@ contract MultiLineSpell {
                     bytes32("line"),
                     lines[i]
             );
-            pause.plan(plan, sig, eta);
+            pause.plot(plan, sig, eta);
         }
     }
 

@@ -38,7 +38,7 @@ contract LineSpellTest is DssDeployTestBase {
     }
 
     function testConstructor() public {
-        spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
+        spell = new LineSpell(address(pause), address(govActions), address(vat), ilk, line);
 
         bytes memory expectedSig = abi.encodeWithSignature(
             "file(address,bytes32,bytes32,uint256)",
@@ -47,7 +47,7 @@ contract LineSpellTest is DssDeployTestBase {
         assertEq0(spell.sig(), expectedSig);
 
         assertEq(address(spell.pause()), address(pause));
-        assertEq(address(spell.plan()),  address(plan));
+        assertEq(address(spell.plan()),  address(govActions));
         assertEq(address(spell.vat()),   address(vat));
 
         assertEq(spell.line(), line);
@@ -58,7 +58,7 @@ contract LineSpellTest is DssDeployTestBase {
     }
 
     function testCast() public {
-        spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
+        spell = new LineSpell(address(pause), address(govActions), address(vat), ilk, line);
         elect();
         spell.schedule();
         hevm.warp(now + wait);
@@ -69,7 +69,7 @@ contract LineSpellTest is DssDeployTestBase {
     }
 
     function testFailRepeatedCast() public {
-        spell = new LineSpell(address(pause), address(plan), address(vat), ilk, line);
+        spell = new LineSpell(address(pause), address(govActions), address(vat), ilk, line);
         elect();
         spell.schedule();
         hevm.warp(now + wait);
