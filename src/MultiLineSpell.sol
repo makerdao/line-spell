@@ -17,13 +17,14 @@ pragma solidity ^0.5.4;
 
 contract PauseLike {
     function delay() public view returns (uint256);
-    function plot(address, bytes memory, uint256) public;
-    function exec(address, bytes memory, uint256) public;
+    function plot(address, bytes32, bytes memory, uint256) public;
+    function exec(address, bytes32, bytes memory, uint256) public;
 }
 
 contract MultiLineSpell {
     PauseLike public pause;
     address   public plan;
+    bytes32   public tag;
     uint256   public eta;
     address   public vat;
     bytes32[] public ilks;
@@ -39,6 +40,9 @@ contract MultiLineSpell {
         vat   = _vat;
         ilks  = _ilks;
         lines = _lines;
+        bytes32 _tag;
+        assembly { _tag := extcodehash(_plan) }
+        tag = _tag;
     }
 
     function schedule() public {
@@ -54,7 +58,7 @@ contract MultiLineSpell {
                     bytes32("line"),
                     lines[i]
             );
-            pause.plot(plan, sig, eta);
+            pause.plot(plan, tag, sig, eta);
         }
     }
 
@@ -70,7 +74,7 @@ contract MultiLineSpell {
                     bytes32("line"),
                     lines[i]
             );
-            pause.exec(plan, sig, eta);
+            pause.exec(plan, tag, sig, eta);
         }
 
         done = true;
